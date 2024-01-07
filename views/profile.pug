@@ -1,7 +1,13 @@
 html
   head
     title Profile
-    link(rel='stylesheet', href='/css/styles.css')
+    link(rel='stylesheet', href='/css/skeleton.min.css')
+    link(rel='stylesheet', href='/css/style.css')
+
   body
-    h1 Profile Page
-    a(href='/logout') Logout
+    .container
+      .inner
+        h1 Profile Page
+        p Welcome #{username}
+        form(action='/logout', method='post')
+          input.button-primary(type='submit', value='Logout', id='logout-button')

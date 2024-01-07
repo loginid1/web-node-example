@@ -5,6 +5,7 @@ import {
   LoginIdEmail,
   LoginIdError,
 } from "@loginid/web-sdk";
+import * as Service from "./service";
 
 const loginForm = document.getElementById("login") as HTMLFormElement;
 const addPasskeyForm = document.getElementById(
@@ -50,6 +51,9 @@ loginButton?.addEventListener("click", async (e) => {
   try {
     try {
       const { auth_data } = await loginIdPasskey.signinWithPasskey(username);
+      await Service.login(username, auth_data.token);
+
+      return;
     } catch (e) {
       if (e instanceof LoginIdError) {
         //user does not exist sign up a new user with email verification
@@ -68,6 +72,8 @@ loginButton?.addEventListener("click", async (e) => {
           emailMessage.remove();
           loginForm.remove();
           addPasskeyForm.style.display = "block";
+
+          return;
         }
       }
 
@@ -86,8 +92,22 @@ addPasskeyButton?.addEventListener("click", async (e) => {
 
   try {
     await loginIdCredentials.addPasskeyWithToken(username, token);
+    //send token to server to be verified
+    await Service.login(username, token);
+  } catch (e) {
+    if (e instanceof Error) {
+      errorMessage.style.display = "block";
+      errorMessage.innerHTML = e.message;
+    }
+  }
+});
 
-    //send to server
+skipButton?.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  try {
+    //send token to server to be verified
+    await Service.login(username, token);
   } catch (e) {
     if (e instanceof Error) {
       errorMessage.style.display = "block";
