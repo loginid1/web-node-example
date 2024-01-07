@@ -1,0 +1,30 @@
+html
+  head
+    title Login
+    link(rel='stylesheet', href='/css/skeleton.min.css')
+    link(rel='stylesheet', href='/css/style.css')
+
+  body
+    .container
+      .inner
+        h1.title Sign In
+        p.email-message An email has been sent to your email address. Please verify your email address to continue.
+
+        form(id="login", action='/login', method='post')
+          label(for='username') Username
+          input(type='text', id='username', name='username', placeholder='Enter your username', autocomplete="username", required)
+          div.button-flex
+            input.button-primary(type='submit', value='next', id='login-button')
+
+        form(id="add-passkey", action='/login', method='post')
+          h4 Set up a passkey on this device!
+          p Next time you sign in, would you like to use this device?
+          div.button-flex-1
+            input.button-primary(type='submit', value='Yes', id='add-passkey-button')
+            input(type='submit', value='Not now', id='skip-button')
+
+        //- Error message element
+        div.error-message
+          p.error-text Error: Invalid username or password.
+
+    script(src='/js/app.js')
