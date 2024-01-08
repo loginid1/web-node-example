@@ -40,6 +40,14 @@ const loginIdCredentials = new LoginIdCredentials(loginIdConfiguration);
 let username = "";
 let token = "";
 
+const addPasskeyView = () => {
+  //change state to add passkey
+  header.remove();
+  emailMessage.remove();
+  loginForm.remove();
+  addPasskeyForm.style.display = "block";
+};
+
 loginButton?.addEventListener("click", async (e) => {
   e.preventDefault();
   emailMessage.style.display = "none";
@@ -56,7 +64,9 @@ loginButton?.addEventListener("click", async (e) => {
       return;
     } catch (e) {
       if (e instanceof LoginIdError) {
-        //user does not exist sign up a new user with email verification
+        //user does not exists with LoginID
+        //sign up with email verification
+        //offer to add passkey
         if (
           e.getErrorCategory() === "not_found" &&
           e.getErrorCode() === "unknown_user"
@@ -68,16 +78,43 @@ loginButton?.addEventListener("click", async (e) => {
           token = auth_data.token;
 
           //change state to add passkey
-          header.remove();
-          emailMessage.remove();
-          loginForm.remove();
-          addPasskeyForm.style.display = "block";
+          addPasskeyView();
+          return;
+        }
 
+        //user exists with LoginID but does not have passkeys
+        //sign in with email verification
+        //offer to add passkey
+        if (
+          e.getErrorCategory() === "not_found" &&
+          e.getErrorCode() === "no_authenticators_found"
+        ) {
+          loginButton.remove();
+          emailMessage.style.display = "block";
+
+          const { auth_data } = await loginIdEmail.signinWithEmail(username);
+          token = auth_data.token;
+
+          //change state to add passkey
+          addPasskeyView();
           return;
         }
       }
 
-      throw e;
+      console.log(e);
+
+      //default to email verification
+      //this will be a catch all for all other errors
+      //we can handle specific errors if we want to but not for this sample
+      //for example, user lock out, user cancelled, no passkeys, etc.
+      loginButton.remove();
+      emailMessage.style.display = "block";
+
+      const { auth_data } = await loginIdEmail.signinWithEmail(username);
+      token = auth_data.token;
+      await Service.login(username, token);
+
+      return;
     }
   } catch (e) {
     if (e instanceof Error) {
