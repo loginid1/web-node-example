@@ -1,4 +1,5 @@
 import {
+  isPlatformAuthenticatorAvailable,
   LoginIdConfiguration,
   LoginIdCredentials,
   LoginIdPasskey,
@@ -31,7 +32,7 @@ if (!appId || !baseUrl) {
   alert("Please provide LOGINID_APP_ID and LOGINID_BASE_URL");
 }
 
-//initialize the sdk
+//initialize the SDK
 const loginIdConfiguration = new LoginIdConfiguration(baseUrl, appId);
 const loginIdPasskey = new LoginIdPasskey(loginIdConfiguration);
 const loginIdEmail = new LoginIdEmail(loginIdConfiguration);
@@ -55,11 +56,22 @@ loginButton?.addEventListener("click", async (e) => {
 
   username = usernameInput.value;
 
-  //attempt to signin with passkeys
   try {
+    //checks if device is capable of creating or using passkeys
+    const platformAvailable = await isPlatformAuthenticatorAvailable();
+
     try {
-      const { auth_data } = await loginIdPasskey.signinWithPasskey(username);
-      await Service.login(username, auth_data.token);
+      if (platformAvailable) {
+        //attempt to sign in with passkeys
+        const { auth_data } = await loginIdPasskey.signinWithPasskey(username);
+        token = auth_data.token;
+      } else {
+        //attempt to sign in with email verification if device is not capable of using passkeys
+        const { auth_data } = await loginIdEmail.signinWithEmail(username);
+        token = auth_data.token;
+      }
+
+      await Service.login(username, token);
 
       return;
     } catch (e) {
@@ -77,8 +89,10 @@ loginButton?.addEventListener("click", async (e) => {
           const { auth_data } = await loginIdEmail.signupWithEmail(username);
           token = auth_data.token;
 
-          //change state to add passkey
-          addPasskeyView();
+          //change state to add passkey if device is capable
+          if (platformAvailable) {
+            addPasskeyView();
+          }
           return;
         }
 
@@ -95,8 +109,10 @@ loginButton?.addEventListener("click", async (e) => {
           const { auth_data } = await loginIdEmail.signinWithEmail(username);
           token = auth_data.token;
 
-          //change state to add passkey
-          addPasskeyView();
+          //change state to add passkey if device is capable
+          if (platformAvailable) {
+            addPasskeyView();
+          }
           return;
         }
       }
@@ -106,7 +122,7 @@ loginButton?.addEventListener("click", async (e) => {
       //default to email verification
       //this will be a catch all for all other errors
       //we can handle specific errors if we want to but not for this sample
-      //for example, user lock out, user cancelled, no passkeys, etc.
+      //for example, user lock out, user canceled, no passkeys, etc.
       loginButton.remove();
       emailMessage.style.display = "block";
 
