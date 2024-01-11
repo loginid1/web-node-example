@@ -33,6 +33,10 @@ PORT=<PORT>
 
 ## How to Run
 
+You can run either with NPM or Docker
+
+### NPM
+
 The following commands will install the dependencies and run the example in dev mode.
 
 ```
@@ -40,7 +44,7 @@ npm install
 npm run dev
 ```
 
-## How to Run With Docker
+### Docker
 
 The following commands will build the example image and run it with Docker.
 
