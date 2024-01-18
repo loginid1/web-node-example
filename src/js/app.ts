@@ -13,6 +13,7 @@ const addPasskeyForm = document.getElementById(
   "add-passkey"
 ) as HTMLFormElement;
 
+const divEnv = document.getElementById("env") as HTMLDivElement;
 const header = document.querySelector(".title") as HTMLHeadingElement;
 const usernameInput = document.getElementById("username") as HTMLInputElement;
 const emailMessage = document.querySelector(".email-message") as HTMLDivElement;
@@ -25,8 +26,9 @@ const addPasskeyButton = document.getElementById(
   "add-passkey-button"
 ) as HTMLButtonElement;
 
-const appId = process.env.LOGINID_APP_ID || "";
-const baseUrl = process.env.LOGINID_BASE_URL || "";
+const appId = divEnv.dataset.loginidAppId || "";
+const baseUrl = divEnv.dataset.loginidBaseUrl || "";
+console.log(appId, baseUrl);
 
 if (!appId || !baseUrl) {
   alert("Please provide LOGINID_APP_ID and LOGINID_BASE_URL");

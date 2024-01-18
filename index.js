@@ -8,6 +8,8 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+const loginidAppId = process.env.LOGINID_APP_ID;
+const loginidBaseUrl = process.env.LOGINID_BASE_URL;
 
 // Session for cookies
 app.use(
@@ -37,7 +39,7 @@ app.get("/", (req, res) => {
   if (req.session?.authenticated) {
     return res.redirect("/profile");
   }
-  res.render("login");
+  res.render("login", { loginidAppId, loginidBaseUrl });
 });
 
 app.post("/login", (req, res) => {

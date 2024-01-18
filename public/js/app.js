@@ -56,6 +56,7 @@ const login = (username, token) => __awaiter(void 0, void 0, void 0, function* (
 
 const loginForm = document.getElementById("login");
 const addPasskeyForm = document.getElementById("add-passkey");
+const divEnv = document.getElementById("env");
 const header = document.querySelector(".title");
 const usernameInput = document.getElementById("username");
 const emailMessage = document.querySelector(".email-message");
@@ -63,8 +64,12 @@ const errorMessage = document.querySelector(".error-message");
 const skipButton = document.getElementById("skip-button");
 const loginButton = document.getElementById("login-button");
 const addPasskeyButton = document.getElementById("add-passkey-button");
-const appId = "58zyiHCxbai3BcFZyhcxHA" ;
-const baseUrl = "https://gvlbddttycr2pmqlvege4q.gen2.qa.loginid.io" ;
+const appId = divEnv.dataset.loginidAppId || "";
+const baseUrl = divEnv.dataset.loginidBaseUrl || "";
+console.log(appId, baseUrl);
+if (!appId || !baseUrl) {
+    alert("Please provide LOGINID_APP_ID and LOGINID_BASE_URL");
+}
 //initialize the SDK
 const loginIdConfiguration = new S(baseUrl, appId);
 const loginIdPasskey = new w(loginIdConfiguration);
